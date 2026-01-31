@@ -131,153 +131,193 @@
     themeBtn.dataset.handled = "true";
   })();
 
-  // TIME DISPLAY
-  function updateTime() {
-    const el = document.getElementById("timeDisplay");
-    if (!el) return;
-    el.innerText =
-      new Date().toLocaleTimeString("en-US", {
-        timeZone: "Asia/Jakarta",
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-      }) + " WIB";
-  }
-  setInterval(updateTime, 1000);
-  updateTime();
+  // ... (Bagian atas kode lu sampai baris 108 yang ada themeBtn.dataset.handled = "true")
 
-  // LENIS (smooth scroll) - expose to window
-  if (window.Lenis) {
-    window.lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true,
-    });
-    function raf(time) {
-      window.lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-  } else {
-    console.warn("Lenis not found — smooth scrolling disabled.");
-  }
+  // mark that main handler installed (so fallback won't duplicate)
+  themeBtn.dataset.handled = "true";
+})();
 
-  // PROFILE TEXT & SKETCH animations (respect reduced-motion)
-  const textElement = document.getElementById("profileText");
-  if (textElement) {
-    textElement.innerHTML = textElement.innerText
-      .split(" ")
-      .map((word) => `<span class="word">${word}</span>`)
-      .join(" ");
-    if (window.gsap && !reduceMotion) {
-      gsap.to(".word", {
-        opacity: 1,
-        color: "var(--text-color)",
-        stagger: 0.05,
-        scrollTrigger: {
-          trigger: ".profile-section",
-          start: "top 60%",
-          end: "bottom 60%",
-          scrub: 0.5,
-        },
-      });
-    } else {
-      document.querySelectorAll(".word").forEach((w) => (w.style.opacity = 1));
-    }
-  }
+// --- START: TAMBAHAN UNTUK HERO FOLKLORE ---
+(function initHeroFolklore() {
+  if (!window.gsap || reduceMotion) return;
 
-  if (window.gsap && !reduceMotion) {
-    gsap.to(".fade-in-trigger", {
-      opacity: 1,
-      y: 0,
-      duration: 1.5,
-      ease: "power3.out",
-      scrollTrigger: { trigger: ".profile-section", start: "top 70%" },
-    });
-  } else {
-    document.querySelectorAll(".fade-in-trigger").forEach((el) => {
-      el.style.opacity = 1;
-      el.style.transform = "translateY(0)";
-    });
-  }
+  // 1. Animasi Ghost Text (Tradition/Algorithm) pas scroll
+  gsap.to(".ghost-text", {
+    xPercent: (i) => (i % 2 === 0 ? -20 : 20),
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".hero",
+      start: "top top",
+      end: "bottom top",
+      scrub: true,
+    },
+  });
 
-  // SKILLS SCROLL
-  const skillsTrack = document.querySelector(".skills-track");
-  if (skillsTrack && window.gsap && !reduceMotion) {
-    let getScrollAmount = () =>
-      -(skillsTrack.scrollWidth - window.innerWidth + 100);
-    gsap.to(skillsTrack, {
-      x: getScrollAmount,
-      ease: "none",
-      scrollTrigger: {
-        trigger: ".skills-section",
-        start: "top top",
-        end: () => `+=${getScrollAmount() * -1}`,
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        onEnter: () => document.body.classList.add("tech-visible"),
-        onLeave: () => document.body.classList.remove("tech-visible"),
-        onEnterBack: () => document.body.classList.add("tech-visible"),
-        onLeaveBack: () => document.body.classList.remove("tech-visible"),
-      },
-    });
-  }
+  // 2. Reveal Title dari bawah dengan gaya "Stagger"
+  gsap.from(".hero-title", {
+    y: 100,
+    opacity: 0,
+    duration: 1.5,
+    ease: "expo.out",
+    delay: 2.2, // Nunggu preloader kelar (biasanya sekitar 2s)
+  });
 
-  if (window.gsap) {
-    ScrollTrigger.create({
-      trigger: ".footer-section",
-      start: "top 10%",
-      onEnter: () => document.body.classList.add("footer-visible"),
-      onLeaveBack: () => document.body.classList.remove("footer-visible"),
-    });
-  }
-
-  // Cursor activation
-  const supportsFinePointer =
-    window.matchMedia && window.matchMedia("(pointer: fine)").matches;
-  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  if (supportsFinePointer && !isTouch) {
-    document.body.classList.add("custom-cursor-active");
-  }
-
-  const cursorDot = document.querySelector(".cursor-dot");
-  const cursorCircle = document.querySelector(".cursor-circle");
-  if (cursorDot && cursorCircle && window.gsap) {
-    document.addEventListener("mousemove", (e) => {
-      gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.08 });
-      gsap.to(cursorCircle, { x: e.clientX, y: e.clientY, duration: 0.3 });
-    });
-    document
-      .querySelectorAll(
-        ".hover-trigger, a, .card, .close-btn, .footer-links a, .scroll-top, .skill-card, .theme-btn",
-      )
-      .forEach((item) => {
-        item.addEventListener("mouseenter", () =>
-          cursorCircle.classList.add("active-cursor"),
-        );
-        item.addEventListener("mouseleave", () =>
-          cursorCircle.classList.remove("active-cursor"),
-        );
-      });
-  }
-
-  // expose projectData
-  if (typeof projectData !== "undefined") window.projectData = projectData;
-
-  // global ESC handler
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const menuBtn = document.getElementById("menuBtn");
-      const menuOverlay = document.getElementById("menuOverlay");
-      if (menuOverlay && menuOverlay.classList.contains("open") && menuBtn) {
-        menuBtn.click();
-      }
-      const sheet = document.getElementById("contentSheet");
-      if (sheet && sheet.classList.contains("active")) {
-        const closeBtn = document.getElementById("closeBtn");
-        if (closeBtn) closeBtn.click();
-      }
-    }
+  // 3. Reveal khusus untuk teks "Folklorist" (Aksen Serif)
+  gsap.from(".accent-serif", {
+    opacity: 0,
+    duration: 2,
+    delay: 2.8,
+    ease: "power2.out",
   });
 })();
+// --- END: TAMBAHAN UNTUK HERO FOLKLORE ---
+
+// TIME DISPLAY
+function updateTime() {
+  const el = document.getElementById("timeDisplay");
+  if (!el) return;
+  el.innerText =
+    new Date().toLocaleTimeString("en-US", {
+      timeZone: "Asia/Jakarta",
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    }) + " WIB";
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// LENIS (smooth scroll) - expose to window
+if (window.Lenis) {
+  window.lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smooth: true,
+  });
+  function raf(time) {
+    window.lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+} else {
+  console.warn("Lenis not found — smooth scrolling disabled.");
+}
+
+// PROFILE TEXT & SKETCH animations (respect reduced-motion)
+const textElement = document.getElementById("profileText");
+if (textElement) {
+  textElement.innerHTML = textElement.innerText
+    .split(" ")
+    .map((word) => `<span class="word">${word}</span>`)
+    .join(" ");
+  if (window.gsap && !reduceMotion) {
+    gsap.to(".word", {
+      opacity: 1,
+      color: "var(--text-color)",
+      stagger: 0.05,
+      scrollTrigger: {
+        trigger: ".profile-section",
+        start: "top 60%",
+        end: "bottom 60%",
+        scrub: 0.5,
+      },
+    });
+  } else {
+    document.querySelectorAll(".word").forEach((w) => (w.style.opacity = 1));
+  }
+}
+
+if (window.gsap && !reduceMotion) {
+  gsap.to(".fade-in-trigger", {
+    opacity: 1,
+    y: 0,
+    duration: 1.5,
+    ease: "power3.out",
+    scrollTrigger: { trigger: ".profile-section", start: "top 70%" },
+  });
+} else {
+  document.querySelectorAll(".fade-in-trigger").forEach((el) => {
+    el.style.opacity = 1;
+    el.style.transform = "translateY(0)";
+  });
+}
+
+// SKILLS SCROLL
+const skillsTrack = document.querySelector(".skills-track");
+if (skillsTrack && window.gsap && !reduceMotion) {
+  let getScrollAmount = () =>
+    -(skillsTrack.scrollWidth - window.innerWidth + 100);
+  gsap.to(skillsTrack, {
+    x: getScrollAmount,
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".skills-section",
+      start: "top top",
+      end: () => `+=${getScrollAmount() * -1}`,
+      pin: true,
+      scrub: 1,
+      invalidateOnRefresh: true,
+      onEnter: () => document.body.classList.add("tech-visible"),
+      onLeave: () => document.body.classList.remove("tech-visible"),
+      onEnterBack: () => document.body.classList.add("tech-visible"),
+      onLeaveBack: () => document.body.classList.remove("tech-visible"),
+    },
+  });
+}
+
+if (window.gsap) {
+  ScrollTrigger.create({
+    trigger: ".footer-section",
+    start: "top 10%",
+    onEnter: () => document.body.classList.add("footer-visible"),
+    onLeaveBack: () => document.body.classList.remove("footer-visible"),
+  });
+}
+
+// Cursor activation
+const supportsFinePointer =
+  window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+if (supportsFinePointer && !isTouch) {
+  document.body.classList.add("custom-cursor-active");
+}
+
+const cursorDot = document.querySelector(".cursor-dot");
+const cursorCircle = document.querySelector(".cursor-circle");
+if (cursorDot && cursorCircle && window.gsap) {
+  document.addEventListener("mousemove", (e) => {
+    gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.08 });
+    gsap.to(cursorCircle, { x: e.clientX, y: e.clientY, duration: 0.3 });
+  });
+  document
+    .querySelectorAll(
+      ".hover-trigger, a, .card, .close-btn, .footer-links a, .scroll-top, .skill-card, .theme-btn",
+    )
+    .forEach((item) => {
+      item.addEventListener("mouseenter", () =>
+        cursorCircle.classList.add("active-cursor"),
+      );
+      item.addEventListener("mouseleave", () =>
+        cursorCircle.classList.remove("active-cursor"),
+      );
+    });
+}
+
+// expose projectData
+if (typeof projectData !== "undefined") window.projectData = projectData;
+
+// global ESC handler
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const menuBtn = document.getElementById("menuBtn");
+    const menuOverlay = document.getElementById("menuOverlay");
+    if (menuOverlay && menuOverlay.classList.contains("open") && menuBtn) {
+      menuBtn.click();
+    }
+    const sheet = document.getElementById("contentSheet");
+    if (sheet && sheet.classList.contains("active")) {
+      const closeBtn = document.getElementById("closeBtn");
+      if (closeBtn) closeBtn.click();
+    }
+  }
+});

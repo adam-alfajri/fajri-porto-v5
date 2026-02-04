@@ -3,6 +3,9 @@
  * Handles skill card animations, progress bars, and interactive effects
  */
 (function () {
+  // Configuration constants
+  const SCROLLTRIGGER_REFRESH_DELAY = 100; // ms to wait for layout completion before refresh
+  
   // Detect reduced motion preference
   const reduceMotion =
     window.matchMedia &&
@@ -79,7 +82,7 @@
     if (window.ScrollTrigger) {
       setTimeout(() => {
         window.ScrollTrigger.refresh();
-      }, 100);
+      }, SCROLLTRIGGER_REFRESH_DELAY);
     }
   }
 
@@ -205,7 +208,7 @@
 
     gsap.from(skillCards, {
       y: 30,
-      scale: 0.95,
+      scale: 0.95, // Subtle scale prevents card shrinking that could affect visibility
       stagger: 0.1,
       duration: 0.8,
       ease: "power3.out",
@@ -225,6 +228,6 @@
     // Refresh ScrollTrigger after setup
     setTimeout(() => {
       window.ScrollTrigger.refresh();
-    }, 100);
+    }, SCROLLTRIGGER_REFRESH_DELAY);
   }
 })();

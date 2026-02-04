@@ -105,6 +105,15 @@ body {
     transition: none !important;
     animation: none !important;
   }
+  .skill-card {
+    transition: transform 0.2s ease !important;
+  }
+  .skill-progress-fill {
+    transition: width 0.3s ease !important;
+  }
+  .skill-top-icon {
+    transition: none !important;
+  }
 }
 
 /* --- TEXTURE & CURSOR --- */
@@ -1196,10 +1205,13 @@ body:not(.dark-mode) .skill-name {
   pointer-events: none;
 }
 .skill-card:hover {
-  transform: translateY(-15px);
+  transform: translateY(-15px) scale(1.02);
   background-color: rgba(255, 255, 255, 0.1);
   border-color: var(--sage);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(180, 184, 171, 0.3),
+    inset 0 0 30px rgba(180, 184, 171, 0.1);
 }
 
 .skill-top-icon {
@@ -1207,9 +1219,16 @@ body:not(.dark-mode) .skill-name {
   top: 40px;
   left: 50%;
   transform: translateX(-50%);
+  transform-origin: center;
   font-size: 1.5rem;
   color: var(--sage);
+  transition: all 0.4s ease;
 }
+.skill-card:hover .skill-top-icon {
+  transform: translateX(-50%) scale(1.3) rotate(180deg);
+  text-shadow: 0 0 20px var(--sage), 0 0 40px var(--sage);
+}
+
 .skill-name {
   font-family: var(--font-story);
   font-size: 2.5rem;
@@ -1226,10 +1245,53 @@ body:not(.dark-mode) .skill-name {
   color: var(--teal);
   line-height: 1.4;
   z-index: 2;
+  margin-bottom: 1.5rem;
 }
 .skill-card:hover .skill-name {
   color: var(--sage);
-  text-shadow: 0 0 20px rgba(180, 184, 171, 0.3);
+  text-shadow: 0 0 20px rgba(180, 184, 171, 0.5);
+}
+
+/* Progress bar styles */
+.skill-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(180, 184, 171, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.skill-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sage), var(--gold));
+  border-radius: 2px;
+  width: 0%;
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(180, 184, 171, 0.5);
+}
+
+.skill-card:hover .skill-progress-fill {
+  box-shadow: 0 0 20px var(--sage), 0 0 30px var(--gold);
+}
+
+.skill-mastery {
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  color: var(--sage);
+  margin-top: 0.5rem;
+  opacity: 0.7;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 2;
+  transition: opacity 0.3s;
+}
+
+.skill-card:hover .skill-mastery {
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(180, 184, 171, 0.3);
 }
 
 /* FOOTER */
@@ -1360,6 +1422,16 @@ body:not(.dark-mode) .skill-name {
   .skill-card {
     width: 220px;
     height: 300px;
+    padding: 2rem 1rem;
+  }
+  .skill-name {
+    font-size: 2rem;
+  }
+  .skill-desc {
+    font-size: 0.8rem;
+  }
+  .skill-mastery {
+    font-size: 0.65rem;
   }
 }
 

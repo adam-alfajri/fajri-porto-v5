@@ -1039,7 +1039,8 @@ body.dark-mode .sketch-img {
   display: block;
   aspect-ratio: auto;
 }
-.cert-image:hover {
+.cert-image:hover,
+.cert-image:focus-visible {
   transform: scale(1.05);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
 }
@@ -1047,7 +1048,8 @@ body.dark-mode .sketch-img {
   opacity: 1;
   transform: scale(1);
 }
-.cert-image.active:hover {
+.cert-image.active:hover,
+.cert-image.active:focus-visible {
   transform: scale(1.05);
 }
 
@@ -1090,12 +1092,14 @@ body.dark-mode .sketch-img {
 /* reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .cert-image {
-    transition: opacity 0.1s linear !important;
-    transform: scale(1) !important;
+    transition: opacity 0.1s linear;
+    transform: scale(1);
   }
   .cert-image:hover,
-  .cert-image.active:hover {
-    transform: scale(1) !important;
+  .cert-image:focus-visible,
+  .cert-image.active:hover,
+  .cert-image.active:focus-visible {
+    transform: scale(1);
   }
   .cert-item {
     transition: none;

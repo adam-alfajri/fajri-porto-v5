@@ -253,6 +253,7 @@
         const aspectRatio = naturalWidth / naturalHeight;
         
         // Adjust image container sizing dynamically with GSAP if available
+        // Wide images (aspect > 1.5): use full width, portrait images (aspect < 1): optimize height
         if (typeof gsap !== "undefined" && !prefersReduced) {
           gsap.set(img, {
             maxWidth: aspectRatio > 1.5 ? "100%" : "90%",

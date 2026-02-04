@@ -31,6 +31,9 @@
 
     // Handle optional demo links
     handleDemoLinks(skillCards);
+
+    // Add entrance animations
+    addEntranceAnimations();
   }
 
   /**
@@ -39,6 +42,12 @@
   function initProgressBars(skillCards) {
     skillCards.forEach((card, index) => {
       const progressValue = parseInt(card.dataset.progress || "0", 10);
+      
+      // Validate progress value
+      if (progressValue < 0 || progressValue > 100) {
+        console.warn(`Invalid progress value ${progressValue} for skill card. Expected 0-100.`);
+      }
+      
       const progressFill = card.querySelector(".skill-progress-fill");
 
       if (!progressFill) return;
@@ -146,21 +155,23 @@
 
         // Visual indicator for clickable cards
         if (!reduceMotion) {
+          // Store original text on first setup
+          const mastery = card.querySelector(".skill-mastery");
+          if (mastery && !mastery.dataset.originalText) {
+            mastery.dataset.originalText = mastery.textContent;
+          }
+
           card.addEventListener("mouseenter", function () {
             const mastery = this.querySelector(".skill-mastery");
             if (mastery) {
-              mastery.textContent = mastery.textContent.replace(
-                "Mastery",
-                "Click to View Demo",
-              );
+              mastery.textContent = "Click to View Demo";
             }
           });
 
           card.addEventListener("mouseleave", function () {
             const mastery = this.querySelector(".skill-mastery");
-            if (mastery) {
-              const progress = this.dataset.progress;
-              mastery.textContent = `${progress}% Mastery`;
+            if (mastery && mastery.dataset.originalText) {
+              mastery.textContent = mastery.dataset.originalText;
             }
           });
         }
@@ -190,7 +201,4 @@
       },
     });
   }
-
-  // Call entrance animations
-  addEntranceAnimations();
 })();

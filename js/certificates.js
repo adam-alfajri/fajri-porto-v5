@@ -61,7 +61,7 @@
       // update inline styles for compatibility
       images.forEach((img) => {
         img.style.opacity = img === nextImgEl ? "1" : "0";
-        img.style.transform = img === nextImgEl ? "scale(1)" : "scale(1.02)";
+        img.style.transform = "scale(1)";
       });
       updateCaptionFromId(currentId);
       setAriaHidden();
@@ -98,7 +98,7 @@
       );
     }
 
-    // bring next image up
+    // bring next image up with dynamic sizing
     // set starting state quickly to avoid flicker
     gsap.set(nextImgEl, { opacity: 0, scale: 1.02, y: -6 });
     tl.to(
@@ -246,6 +246,21 @@
     if (src) {
       const pre = new Image();
       pre.src = src;
+      // dynamically adjust image dimensions after load
+      pre.onload = function () {
+        const naturalWidth = pre.naturalWidth;
+        const naturalHeight = pre.naturalHeight;
+        const aspectRatio = naturalWidth / naturalHeight;
+        
+        // Adjust image container sizing dynamically with GSAP if available
+        // Wide images (aspect > 1.5): use full width, portrait images (aspect < 1): optimize height
+        if (typeof gsap !== "undefined" && !prefersReduced) {
+          gsap.set(img, {
+            maxWidth: aspectRatio > 1.5 ? "100%" : "90%",
+            maxHeight: aspectRatio < 1 ? "100%" : "90%",
+          });
+        }
+      };
     }
   });
 

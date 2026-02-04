@@ -3,6 +3,9 @@
  * Handles skill card animations, progress bars, and interactive effects
  */
 (function () {
+  // Configuration constants
+  const SCROLLTRIGGER_REFRESH_DELAY = 100; // ms to wait for layout completion before refresh
+  
   // Detect reduced motion preference
   const reduceMotion =
     window.matchMedia &&
@@ -52,7 +55,7 @@
 
       if (!progressFill) return;
 
-      if (window.gsap && !reduceMotion) {
+      if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         // Use GSAP for smooth, staggered animations
         gsap.to(progressFill, {
           width: `${progressValue}%`,
@@ -63,6 +66,10 @@
             trigger: card,
             start: "top 80%",
             once: true,
+            onEnter: () => {
+              // Ensure card is visible when animation triggers
+              gsap.set(card, { opacity: 1 });
+            },
           },
         });
       } else {
@@ -70,6 +77,13 @@
         progressFill.style.width = `${progressValue}%`;
       }
     });
+    
+    // Refresh ScrollTrigger after layout is complete
+    if (window.ScrollTrigger) {
+      setTimeout(() => {
+        window.ScrollTrigger.refresh();
+      }, SCROLLTRIGGER_REFRESH_DELAY);
+    }
   }
 
   /**
@@ -183,14 +197,18 @@
    * Add entrance animations for skill cards (optional enhancement)
    */
   function addEntranceAnimations() {
-    if (reduceMotion || !window.gsap) return;
+    if (reduceMotion || !window.gsap || !window.ScrollTrigger) return;
 
     const skillCards = document.querySelectorAll(".skill-card");
+    
+    // Set initial opacity to 1 in CSS, then animate from transformed state
+    skillCards.forEach(card => {
+      gsap.set(card, { opacity: 1 }); // Ensure baseline visibility
+    });
 
     gsap.from(skillCards, {
-      opacity: 0,
       y: 30,
-      scale: 0.9,
+      scale: 0.95, // Subtle scale prevents card shrinking that could affect visibility
       stagger: 0.1,
       duration: 0.8,
       ease: "power3.out",
@@ -198,7 +216,18 @@
         trigger: ".skills-section",
         start: "top 70%",
         once: true,
+        onRefresh: () => {
+          // Ensure cards are visible during refresh
+          skillCards.forEach(card => {
+            gsap.set(card, { opacity: 1 });
+          });
+        },
       },
     });
+    
+    // Refresh ScrollTrigger after setup
+    setTimeout(() => {
+      window.ScrollTrigger.refresh();
+    }, SCROLLTRIGGER_REFRESH_DELAY);
   }
 })();

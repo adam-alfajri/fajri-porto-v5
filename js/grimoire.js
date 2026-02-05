@@ -6,6 +6,7 @@
 (function () {
   // Configuration constants
   const SCROLLTRIGGER_REFRESH_DELAY = 100; // ms to wait for layout completion before refresh
+  const RAIN_STAGGER_DELAY = 0.05; // seconds between each card's rain animation
   
   // Detect reduced motion preference
   const reduceMotion =
@@ -254,7 +255,7 @@
         start: "top 80%",
         end: "top 30%",
         scrub: 1,
-        once: false,
+        once: true, // Only play animation once for better performance
       }
     });
 
@@ -287,7 +288,7 @@
         opacity: 1,
         ease: "power2.out",
         duration: 0.8,
-      }, index * 0.05); // Slight stagger for natural feel
+      }, index * RAIN_STAGGER_DELAY); // Slight stagger for natural feel
     });
 
     // Refresh ScrollTrigger after rain effect setup

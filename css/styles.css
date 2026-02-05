@@ -1162,7 +1162,8 @@ body.dark-mode .skill-card {
 
 .skills-wrapper {
   width: 100%;
-  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: visible;
   padding-top: 40px;
   padding-bottom: 40px;
   margin-top: -40px;

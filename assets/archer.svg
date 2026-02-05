@@ -1,0 +1,33 @@
+<svg width="120" height="180" viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Classical archer character -->
+  <g id="archer">
+    <!-- Body -->
+    <ellipse cx="60" cy="110" rx="18" ry="28" fill="#153243" opacity="0.9"/>
+    
+    <!-- Head -->
+    <circle cx="60" cy="70" r="16" fill="#153243"/>
+    
+    <!-- Bow -->
+    <path d="M 35 85 Q 30 105 35 125" stroke="#b4b8ab" stroke-width="3" fill="none" stroke-linecap="round"/>
+    
+    <!-- Bow string -->
+    <line x1="35" y1="85" x2="35" y2="125" stroke="#b4b8ab" stroke-width="1.5" opacity="0.7"/>
+    
+    <!-- Arms -->
+    <path d="M 60 95 L 40 100" stroke="#153243" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 60 95 L 50 110" stroke="#153243" stroke-width="5" stroke-linecap="round"/>
+    
+    <!-- Legs -->
+    <path d="M 60 135 L 55 160" stroke="#153243" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 60 135 L 65 160" stroke="#153243" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- Hood/Cape detail -->
+    <path d="M 50 65 Q 60 60 70 65" stroke="#b4b8ab" stroke-width="2" fill="none" opacity="0.6"/>
+    
+    <!-- Arrow ready position (hidden by default, animated separately) -->
+    <g id="ready-arrow" opacity="0">
+      <line x1="36" y1="105" x2="75" y2="105" stroke="#d4af37" stroke-width="2"/>
+      <path d="M 75 105 L 70 102 L 70 108 Z" fill="#d4af37"/>
+    </g>
+  </g>
+</svg>

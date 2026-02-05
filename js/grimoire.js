@@ -1,12 +1,13 @@
 /**
- * Technical Grimoire Interactivity
- * Handles skill card animations, progress bars, and interactive effects
- * Includes rain effect and dynamic heading transition
+ * Technical Grimoire Interactivity - Archery Skill Shots
+ * Handles skill card animations with archery theme, progress bars, and interactive effects
+ * Features: Archer character, arrow shooting, target animations, and dynamic grid formation
  */
 (function () {
   // Configuration constants
   const SCROLLTRIGGER_REFRESH_DELAY = 100; // ms to wait for layout completion before refresh
-  const RAIN_STAGGER_DELAY = 0.05; // seconds between each card's rain animation
+  const ARROW_SHOOT_DELAY = 0.5; // seconds between each arrow shot
+  const ARROW_FLIGHT_DURATION = 0.8; // seconds for arrow to reach target
   
   // Detect reduced motion preference
   const reduceMotion =
@@ -37,8 +38,8 @@
     // Handle optional demo links
     handleDemoLinks(skillCards);
 
-    // Add rain effect and grid formation
-    addRainEffect(skillCards);
+    // Add archery skill shots feature
+    initArcheryAnimation(skillCards);
 
     // Add dynamic heading transition
     addHeadingTransition();
@@ -240,58 +241,290 @@
   }
 
   /**
-   * Add rain effect animation where icons fall and then form a grid
+   * Initialize archery animation system
+   * Creates archer character, manages targets, shoots arrows, and forms grid
    */
-  function addRainEffect(skillCards) {
-    if (reduceMotion || !window.gsap || !window.ScrollTrigger) return;
+  function initArcheryAnimation(skillCards) {
+    if (reduceMotion || !window.gsap || !window.ScrollTrigger) {
+      // Fallback: simple fade-in for skill cards
+      skillCards.forEach(card => {
+        gsap.set(card, { opacity: 1 });
+      });
+      return;
+    }
 
     const skillsSection = document.querySelector(".skills-section");
     if (!skillsSection) return;
 
-    // Create timeline for rain effect
-    const rainTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: skillsSection,
-        start: "top 80%",
-        end: "top 30%",
-        scrub: 1,
-        once: true, // Only play animation once for better performance
-      }
-    });
+    // Create archer container
+    const archerContainer = createArcherCharacter(skillsSection);
 
-    // Set initial random positions for rain effect
+    // Phase 1: Scatter targets randomly with subtle animations
+    scatterTargets(skillCards);
+
+    // Phase 2: Show archer and shoot arrows at targets
+    shootArrowsAtTargets(skillCards, archerContainer);
+
+    // Phase 3: Form grid layout as user scrolls further
+    formGridLayout(skillCards, archerContainer);
+  }
+
+  /**
+   * Create and add archer character to the skills section
+   */
+  function createArcherCharacter(container) {
+    const archerContainer = document.createElement('div');
+    archerContainer.className = 'archer-container';
+    archerContainer.innerHTML = `
+      <svg width="120" height="180" viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="archer">
+          <ellipse cx="60" cy="110" rx="18" ry="28" fill="currentColor" opacity="0.9"/>
+          <circle cx="60" cy="70" r="16" fill="currentColor"/>
+          <path d="M 35 85 Q 30 105 35 125" stroke="var(--sage)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <line x1="35" y1="85" x2="35" y2="125" stroke="var(--sage)" stroke-width="1.5" opacity="0.7"/>
+          <path d="M 60 95 L 40 100" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          <path d="M 60 95 L 50 110" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          <path d="M 60 135 L 55 160" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 60 135 L 65 160" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 50 65 Q 60 60 70 65" stroke="var(--sage)" stroke-width="2" fill="none" opacity="0.6"/>
+        </g>
+      </svg>
+    `;
+    
+    container.appendChild(archerContainer);
+    return archerContainer;
+  }
+
+  /**
+   * Scatter skill cards randomly as targets
+   */
+  function scatterTargets(skillCards) {
+    const skillsSection = document.querySelector(".skills-section");
+    
     skillCards.forEach((card, index) => {
-      // Random horizontal position (within reasonable bounds)
-      const randomX = (Math.random() - 0.5) * 400;
-      // Start above viewport
-      const randomY = -300 - Math.random() * 200;
-      // Random size variation (0.6 to 1.1)
-      const randomScale = 0.6 + Math.random() * 0.5;
-      // Random rotation
-      const randomRotation = (Math.random() - 0.5) * 40;
-
-      // Set initial state
+      // Add target marker classes
+      card.classList.add('target-active');
+      
+      // Create hit effect element
+      const hitEffect = document.createElement('div');
+      hitEffect.className = 'hit-effect';
+      card.appendChild(hitEffect);
+      
+      // Random scattered positions
+      const randomX = (Math.random() - 0.5) * 300;
+      const randomY = -200 - Math.random() * 150;
+      const randomRotation = (Math.random() - 0.5) * 20;
+      
+      // Set initial scattered state
       gsap.set(card, {
         x: randomX,
         y: randomY,
-        scale: randomScale,
         rotation: randomRotation,
         opacity: 0,
+        scale: 0.8
       });
-
-      // Add to timeline with stagger
-      rainTimeline.to(card, {
+      
+      // Animate targets falling in
+      gsap.to(card, {
         y: 0,
-        x: 0,
-        scale: 1,
+        x: randomX * 0.3, // Reduced scatter for better visibility
         rotation: 0,
         opacity: 1,
+        scale: 1,
+        duration: 1,
         ease: "power2.out",
-        duration: 0.8,
-      }, index * RAIN_STAGGER_DELAY); // Slight stagger for natural feel
+        delay: index * 0.15,
+        scrollTrigger: {
+          trigger: skillsSection,
+          start: "top 80%",
+          once: true
+        }
+      });
+      
+      // Add subtle bouncing animation to targets
+      gsap.to(card, {
+        y: "+=10",
+        duration: 2 + Math.random(),
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+        delay: index * 0.2,
+        scrollTrigger: {
+          trigger: skillsSection,
+          start: "top 80%",
+          end: "top 30%",
+          toggleActions: "play pause resume pause"
+        }
+      });
     });
+  }
 
-    // Refresh ScrollTrigger after rain effect setup
+  /**
+   * Shoot arrows at skill card targets with animation
+   */
+  function shootArrowsAtTargets(skillCards, archerContainer) {
+    const skillsSection = document.querySelector(".skills-section");
+    
+    // Show archer when scrolling into view
+    gsap.to(archerContainer, {
+      opacity: 1,
+      duration: 0.8,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: skillsSection,
+        start: "top 70%",
+        once: true
+      }
+    });
+    
+    // Shoot arrows at each target
+    skillCards.forEach((card, index) => {
+      const shootDelay = 1 + index * ARROW_SHOOT_DELAY;
+      
+      ScrollTrigger.create({
+        trigger: skillsSection,
+        start: "top 70%",
+        once: true,
+        onEnter: () => {
+          gsap.delayedCall(shootDelay, () => {
+            shootArrowAtTarget(archerContainer, card, skillsSection);
+          });
+        }
+      });
+    });
+  }
+
+  /**
+   * Shoot a single arrow from archer to target
+   */
+  function shootArrowAtTarget(archer, target, container) {
+    if (reduceMotion) return;
+    
+    // Add shooting animation to archer
+    archer.classList.add('shooting');
+    setTimeout(() => archer.classList.remove('shooting'), 600);
+    
+    // Create arrow element
+    const arrow = document.createElement('div');
+    arrow.className = 'arrow-projectile flying';
+    arrow.innerHTML = `
+      <svg width="60" height="8" viewBox="0 0 60 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="4" x2="52" y2="4" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 52 4 L 60 4 L 56 1 M 60 4 L 56 7" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M 5 2 L 0 4 L 5 6" fill="var(--sage)" opacity="0.8"/>
+      </svg>
+    `;
+    
+    container.appendChild(arrow);
+    
+    // Get positions
+    const archerRect = archer.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    // Calculate start and end positions
+    const startX = archerRect.right - containerRect.left;
+    const startY = archerRect.top + archerRect.height / 2 - containerRect.top;
+    const endX = targetRect.left + targetRect.width / 2 - containerRect.left;
+    const endY = targetRect.top + targetRect.height / 2 - containerRect.top;
+    
+    // Calculate angle for arrow rotation
+    const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
+    
+    // Set initial position
+    gsap.set(arrow, {
+      left: startX,
+      top: startY,
+      rotation: angle
+    });
+    
+    // Animate arrow with curved path
+    gsap.to(arrow, {
+      left: endX,
+      top: endY,
+      duration: ARROW_FLIGHT_DURATION,
+      ease: "power2.out",
+      onComplete: () => {
+        // Hit effect
+        hitTarget(target);
+        arrow.remove();
+      }
+    });
+    
+    // Add slight curve to arrow path (y-axis adjustment)
+    const curveHeight = -30;
+    gsap.to(arrow, {
+      top: `+=${curveHeight}`,
+      duration: ARROW_FLIGHT_DURATION / 2,
+      ease: "power1.out",
+      yoyo: true,
+      repeat: 1
+    });
+  }
+
+  /**
+   * Apply hit effect to target
+   */
+  function hitTarget(target) {
+    // Add hit class for visual feedback
+    target.classList.add('hit');
+    
+    // Trigger hit effect animation
+    const hitEffect = target.querySelector('.hit-effect');
+    if (hitEffect) {
+      hitEffect.classList.add('active');
+      
+      // Remove effect classes after animation
+      setTimeout(() => {
+        hitEffect.classList.remove('active');
+        target.classList.remove('hit');
+      }, 800);
+    }
+    
+    // Remove target marker after hit
+    setTimeout(() => {
+      target.classList.remove('target-active');
+    }, 500);
+  }
+
+  /**
+   * Form grid layout as user scrolls further down
+   */
+  function formGridLayout(skillCards, archerContainer) {
+    const skillsSection = document.querySelector(".skills-section");
+    
+    // Create timeline for grid formation
+    const gridTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: skillsSection,
+        start: "top 30%",
+        end: "top top",
+        scrub: 1
+      }
+    });
+    
+    // Fade out archer
+    gridTimeline.to(archerContainer, {
+      opacity: 0,
+      duration: 0.5,
+      ease: "power2.inOut"
+    }, 0);
+    
+    // Move cards to grid positions
+    skillCards.forEach((card, index) => {
+      card.classList.add('grid-forming');
+      
+      gridTimeline.to(card, {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        duration: 1,
+        ease: "power2.inOut"
+      }, 0.2);
+    });
+    
+    // Refresh ScrollTrigger
     setTimeout(() => {
       window.ScrollTrigger.refresh();
     }, SCROLLTRIGGER_REFRESH_DELAY);

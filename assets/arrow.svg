@@ -1,0 +1,13 @@
+<svg width="60" height="8" viewBox="0 0 60 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Arrow projectile -->
+  <g id="arrow">
+    <!-- Shaft -->
+    <line x1="0" y1="4" x2="52" y2="4" stroke="#d4af37" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Arrowhead -->
+    <path d="M 52 4 L 60 4 L 56 1 M 60 4 L 56 7" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- Fletching -->
+    <path d="M 5 2 L 0 4 L 5 6" fill="#b4b8ab" opacity="0.8"/>
+  </g>
+</svg>

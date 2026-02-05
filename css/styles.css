@@ -1124,6 +1124,7 @@ body.dark-mode .sketch-img {
   overflow: hidden;
   z-index: 10;
   transition: background-color 0.8s;
+  min-height: 100vh;
 }
 body.dark-mode .skill-card {
   background-color: var(--card-bg);
@@ -1136,12 +1137,15 @@ body.dark-mode .skill-card {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  transition: all 0.3s ease;
+  will-change: transform, opacity;
 }
 .skills-header h2 {
   font-family: var(--font-story);
   font-size: 4rem;
   line-height: 1;
   color: var(--text-color);
+  transition: all 0.3s ease;
 }
 .skills-header em {
   color: var(--sage);
@@ -1153,20 +1157,27 @@ body.dark-mode .skill-card {
   color: var(--teal);
   letter-spacing: 0.05em;
   font-style: italic;
+  transition: opacity 0.3s ease;
 }
 
 .skills-wrapper {
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   padding-top: 40px;
   padding-bottom: 40px;
   margin-top: -40px;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .skills-track {
   display: flex;
   gap: 2rem;
   padding-left: 5vw;
   width: max-content;
+  position: relative;
 }
 
 .skill-card {
@@ -1186,6 +1197,8 @@ body.dark-mode .skill-card {
   cursor: pointer;
   overflow: hidden;
   opacity: 1; /* Default opacity ensures baseline visibility */
+  will-change: transform, opacity;
+  transform-origin: center center;
 }
 body:not(.dark-mode) .skill-card {
   background-color: #0f2532;

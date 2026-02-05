@@ -1,6 +1,7 @@
 /**
  * Technical Grimoire Interactivity
  * Handles skill card animations, progress bars, and interactive effects
+ * Includes rain effect and dynamic heading transition
  */
 (function () {
   // Configuration constants
@@ -35,7 +36,13 @@
     // Handle optional demo links
     handleDemoLinks(skillCards);
 
-    // Add entrance animations
+    // Add rain effect and grid formation
+    addRainEffect(skillCards);
+
+    // Add dynamic heading transition
+    addHeadingTransition();
+
+    // Add entrance animations (kept for compatibility)
     addEntranceAnimations();
   }
 
@@ -226,6 +233,98 @@
     });
     
     // Refresh ScrollTrigger after setup
+    setTimeout(() => {
+      window.ScrollTrigger.refresh();
+    }, SCROLLTRIGGER_REFRESH_DELAY);
+  }
+
+  /**
+   * Add rain effect animation where icons fall and then form a grid
+   */
+  function addRainEffect(skillCards) {
+    if (reduceMotion || !window.gsap || !window.ScrollTrigger) return;
+
+    const skillsSection = document.querySelector(".skills-section");
+    if (!skillsSection) return;
+
+    // Set initial random positions for rain effect
+    skillCards.forEach((card, index) => {
+      // Random horizontal position
+      const randomX = Math.random() * window.innerWidth - window.innerWidth / 2;
+      // Start above viewport
+      const randomY = -200 - Math.random() * 300;
+      // Random size variation (0.7 to 1.2)
+      const randomScale = 0.7 + Math.random() * 0.5;
+      // Random rotation
+      const randomRotation = Math.random() * 60 - 30;
+
+      // Set initial state
+      gsap.set(card, {
+        x: randomX,
+        y: randomY,
+        scale: randomScale,
+        rotation: randomRotation,
+        opacity: 0,
+      });
+
+      // Create rain falling animation
+      gsap.to(card, {
+        y: 0,
+        x: 0,
+        scale: 1,
+        rotation: 0,
+        opacity: 1,
+        duration: 1.5 + index * 0.15, // Staggered timing
+        ease: "bounce.out",
+        scrollTrigger: {
+          trigger: skillsSection,
+          start: "top 60%",
+          end: "center center",
+          scrub: 1,
+          onEnter: () => {
+            // Ensure visibility when animation starts
+            gsap.set(card, { opacity: 1 });
+          },
+        },
+      });
+    });
+
+    // Refresh ScrollTrigger after rain effect setup
+    setTimeout(() => {
+      window.ScrollTrigger.refresh();
+    }, SCROLLTRIGGER_REFRESH_DELAY);
+  }
+
+  /**
+   * Add dynamic heading transition - moves to center as user scrolls
+   */
+  function addHeadingTransition() {
+    if (reduceMotion || !window.gsap || !window.ScrollTrigger) return;
+
+    const skillsHeader = document.querySelector(".skills-header");
+    if (!skillsHeader) return;
+
+    // Animate heading to center
+    gsap.to(skillsHeader, {
+      y: 100,
+      scale: 1.2,
+      opacity: 0.9,
+      scrollTrigger: {
+        trigger: ".skills-section",
+        start: "top top",
+        end: "center top",
+        scrub: 2,
+        onUpdate: (self) => {
+          // Additional fade effect based on scroll progress
+          const progress = self.progress;
+          gsap.set(skillsHeader, {
+            opacity: 1 - progress * 0.5,
+          });
+        },
+      },
+    });
+
+    // Refresh ScrollTrigger
     setTimeout(() => {
       window.ScrollTrigger.refresh();
     }, SCROLLTRIGGER_REFRESH_DELAY);

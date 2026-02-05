@@ -247,16 +247,27 @@
     const skillsSection = document.querySelector(".skills-section");
     if (!skillsSection) return;
 
+    // Create timeline for rain effect
+    const rainTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: skillsSection,
+        start: "top 80%",
+        end: "top 30%",
+        scrub: 1,
+        once: false,
+      }
+    });
+
     // Set initial random positions for rain effect
     skillCards.forEach((card, index) => {
-      // Random horizontal position
-      const randomX = Math.random() * window.innerWidth - window.innerWidth / 2;
+      // Random horizontal position (within reasonable bounds)
+      const randomX = (Math.random() - 0.5) * 400;
       // Start above viewport
-      const randomY = -200 - Math.random() * 300;
-      // Random size variation (0.7 to 1.2)
-      const randomScale = 0.7 + Math.random() * 0.5;
+      const randomY = -300 - Math.random() * 200;
+      // Random size variation (0.6 to 1.1)
+      const randomScale = 0.6 + Math.random() * 0.5;
       // Random rotation
-      const randomRotation = Math.random() * 60 - 30;
+      const randomRotation = (Math.random() - 0.5) * 40;
 
       // Set initial state
       gsap.set(card, {
@@ -267,26 +278,16 @@
         opacity: 0,
       });
 
-      // Create rain falling animation
-      gsap.to(card, {
+      // Add to timeline with stagger
+      rainTimeline.to(card, {
         y: 0,
         x: 0,
         scale: 1,
         rotation: 0,
         opacity: 1,
-        duration: 1.5 + index * 0.15, // Staggered timing
-        ease: "bounce.out",
-        scrollTrigger: {
-          trigger: skillsSection,
-          start: "top 60%",
-          end: "center center",
-          scrub: 1,
-          onEnter: () => {
-            // Ensure visibility when animation starts
-            gsap.set(card, { opacity: 1 });
-          },
-        },
-      });
+        ease: "power2.out",
+        duration: 0.8,
+      }, index * 0.05); // Slight stagger for natural feel
     });
 
     // Refresh ScrollTrigger after rain effect setup
@@ -304,23 +305,16 @@
     const skillsHeader = document.querySelector(".skills-header");
     if (!skillsHeader) return;
 
-    // Animate heading to center
+    // Animate heading with fade and subtle movement
     gsap.to(skillsHeader, {
-      y: 100,
-      scale: 1.2,
-      opacity: 0.9,
+      y: 50,
+      opacity: 0.3,
       scrollTrigger: {
         trigger: ".skills-section",
         start: "top top",
-        end: "center top",
+        end: "top -20%",
         scrub: 2,
-        onUpdate: (self) => {
-          // Additional fade effect based on scroll progress
-          const progress = self.progress;
-          gsap.set(skillsHeader, {
-            opacity: 1 - progress * 0.5,
-          });
-        },
+        pin: false,
       },
     });
 

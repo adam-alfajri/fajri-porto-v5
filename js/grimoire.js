@@ -381,19 +381,16 @@
     skillCards.forEach((card, index) => {
       const shootDelay = 1 + index * ARROW_SHOOT_DELAY;
       
-      gsap.delayedCall(shootDelay, () => {
-        shootArrowAtTarget(archerContainer, card, skillsSection);
-      }, null, skillsSection);
-    });
-    
-    // Create scroll trigger for arrow shooting phase
-    ScrollTrigger.create({
-      trigger: skillsSection,
-      start: "top 70%",
-      once: true,
-      onEnter: () => {
-        // Trigger handled by delayedCall above
-      }
+      ScrollTrigger.create({
+        trigger: skillsSection,
+        start: "top 70%",
+        once: true,
+        onEnter: () => {
+          gsap.delayedCall(shootDelay, () => {
+            shootArrowAtTarget(archerContainer, card, skillsSection);
+          });
+        }
+      });
     });
   }
 

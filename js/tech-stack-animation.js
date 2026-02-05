@@ -5,7 +5,7 @@
 (function () {
   // Configuration
   const ICON_ACTIVATION_DELAY = 0.3; // seconds between each icon activation
-  const PEN_DRAW_DURATION = 1.2; // seconds for pen to draw lines
+  const PEN_DRAW_DURATION = 1.2; // base duration for pen animation sequence (movement + drawing)
   
   // Detect reduced motion preference
   const reduceMotion =
@@ -141,7 +141,7 @@
       },
       onComplete: () => {
         // Draw random lines near the icon
-        drawRandomLines(icon, penIcon);
+        drawRandomLines(icon);
         
         // Activate the icon
         icon.classList.add("active");
@@ -157,7 +157,7 @@
   /**
    * Draw random connected lines near the activated icon
    */
-  function drawRandomLines(icon, penIcon) {
+  function drawRandomLines(icon) {
     const trailsGroup = document.querySelector(".pen-trails");
     if (!trailsGroup) return;
 
